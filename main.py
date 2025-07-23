@@ -22,3 +22,4 @@ if submit_button and youtube_url and query:
     response= yth.get_response_from_query(db,query)
     st.subheader("Answer:")
     st.text(textwrap.fill(response, width=80))
+
