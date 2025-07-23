@@ -1,22 +1,13 @@
-from langchain_openai import OpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains.llm import LLMChain
-#from langchain_huggingface import HuggingFaceEndpoint
-from dotenv import load_dotenv
-import os
+import langchain_helper as lch
+import streamlit as st
 
-load_dotenv()
+st.title("Cute Pet Name Generator")
 
-def gen_pet_name(animal_type):
-    llm = OpenAI(temperature=0.7, max_tokens=64, model="gpt-4.1-nano")
-    prompt= PromptTemplate(
-        input_variables=['animal_type'],
-        template="Suggest five cute {animal_type} pet names."
-    )
-    name_chain = prompt | llm
+animal_type = st.sidebar.selectbox(
+    "Select an animal type",("cat", "dog", "cow", "pig", "sheep"))
 
-    response= name_chain.invoke({'animal_type': animal_type})
-    return response
-
-if __name__ == "__main__":
-    print(gen_pet_name("cow"))
+if animal_type:
+    with st.spinner("Generating cute pet names..."):
+        names = lch.gen_pet_name(animal_type)
+        st.write(f"Here are some cute {animal_type} names:")
+        st.write(names)
