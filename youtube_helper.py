@@ -1,23 +1,32 @@
 from langchain_community.document_loaders import YoutubeLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAI
+from langchain_openai import OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
 from langchain_community.vectorstores import FAISS
+from youtube_transcript_api import YouTubeTranscriptApi
+from langchain_core.documents import Document
 from dotenv import load_dotenv
 
 load_dotenv()
 
-embeddings= OpenAI(temperature=0.7, max_tokens=64)
-video_url = "https://www.youtube.com/watch?v=vJOGC8QJZJQ"
-def create_vector_db_from_youtube(video_url) -> FAISS:
-    loader = YoutubeLoader.from_youtube_url(video_url, add_video_info=True)
-    documents = loader.load()
-    
+embeddings = OpenAIEmbeddings()
+ytt= YouTubeTranscriptApi()
+video_id = "vJOGC8QJZJQ"
+def create_vector_db_from_youtube(video_id) -> FAISS:
+    loader = ytt.list(video_id=video_id)
+    loader = loader.find_transcript(['en'])  # or ['en', 'hi'] for fallback
+    if not loader:
+        raise ValueError("No transcript found for the video.")
+    documents = " ".join([line.text for line in loader.fetch()])
+    if not documents:
+        raise ValueError("No documents found in the transcript.")
+       
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    texts = text_splitter.split_documents(documents)
-    
-    vector_db = FAISS.from_documents(texts, embeddings)
+    texts = text_splitter.split_text(documents)
+    docs= [Document(page_content=text) for text in texts]
+    vector_db = FAISS.from_documents(docs, embeddings)
     return vector_db
 
 def get_response_from_query(db,query,k=4):
