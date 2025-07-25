@@ -3,6 +3,8 @@ langchain
 langchain-openai
 python-dotenv
 PyPDF2
+langchain_community
+langchain_core
 openai
 faiss-cpu
 tiktoken

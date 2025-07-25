@@ -16,7 +16,6 @@ from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_core.runnables import Runnable
 import streamlit as st
 
-openai_key = st.secrets["OPENAI_API_KEY"]
 
 load_dotenv()
 
@@ -68,4 +67,4 @@ def pdf_agent(pdf_path, q=None):
     )
     return agent
 
-#print(pdf_agent("Health_Report.pdf").run("What is the patient's biological age?"))  # Example usage, can be removed later
+print(pdf_agent("Health_Report.pdf").run("What is the patient's biological age?"))  # Example usage, can be removed later
