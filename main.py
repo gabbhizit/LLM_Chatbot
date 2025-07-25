@@ -17,8 +17,9 @@ if submit and uploaded_file is not None and query:
         pdf_path = tmp_file.name
 
     st.success("PDF uploaded successfully!")
-    db = pdfh.create_vector_db_from_pdf(pdf_path)
-    response = pdfh.get_response_from_query(db, query)
+    agent = pdfh.pdf_agent(pdf_path, query)  # Initialize agent
+    response = agent.run(query)              # Ask your query
+    st.markdown("### 🤖 Response")
     st.write(response)
 
 
